@@ -1,0 +1,5 @@
+*.idea
+*.pyc
+database.db
+venv/
+.python-version
