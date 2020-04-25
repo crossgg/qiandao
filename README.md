@@ -11,12 +11,23 @@ http://cordimax.f3322.net:5558/381.html
 
 https://hexo.aragon.wang/2020/04/11/%E7%AD%BE%E5%88%B0%E5%A4%B1%E8%B4%A5%E6%8E%A8%E9%80%81%E5%88%B0%E6%89%8B%E6%9C%BA/
 
-需要推送的修改send2phone.py中的：
-
-barklink = "https://bark.test.com/bark_key"
-
-skey = "SCUxxxxxxxxxxxxx"
-
+需要推送的：
+挂载时候添加一个参数 -v 实际目录:/usr/src/app/config,再添加一个config.json文件再实际目录下面，示例：
+```
+docker 启动命令：
+docker run -d --name qiandao -p 12345:80 -v /root/config:/usr/src/app/config q123458384/qiandao
+再在 /root/config 目录下新建一个 config.json文件，内容如下：
+{
+	"bark链接" : "bark的链接，不用就留空",
+	"s酱key" : "s酱的skey，不用就留空",
+	"腾讯问卷":{
+		"链接":"腾讯问卷的链接，不用就留空",
+		"ID":"腾讯问卷的ID，不用就留空",
+		"问题ID":"腾讯问卷的问题ID，不用就留空",
+		"填空ID":"腾讯问卷的填空ID，不用就留空"
+	}
+}
+```
 
 =========
 以下为原镜像说明：
