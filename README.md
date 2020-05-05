@@ -58,8 +58,9 @@ mysql < qiandao.sql
 数据不随项目分发，去 https://qiandao.today/tpls/public 查看你需要的模板，点击下载。 在你自己的主页中 「我的模板+」 点击 + 上传。模板需要发布才会在「公开模板」中展示，你需要管理员权限在「我的发布请求」中审批通过。
 
 设置管理员
-
+```
 ./chrole.py your@email.address admin
+```
 使用Docker部署站点
 可参考 Wiki Docker部署签到站教程
 
@@ -68,12 +69,14 @@ pip install tornado u-msgpack-python jinja2 chardet requests
 ./qiandao.py tpl.har [--key=value]* [env.json]
 config.py
 优先用mailgun方式发送邮件，如果要用smtp方式发送邮件，请填写mail_smtp, mail_user, mail_password
-
+```
 mail_smtp = ""     # 邮件smtp 地址
 mail_user = ""    # 邮件账户
 mail_passowrd = ""   # 邮件密码
 mail_domain = "mail.qiandao.today"
 mailgun_key = ""
+```
+
 鸣谢
 +[Mark][https://www.quchao.net/]
 
