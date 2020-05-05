@@ -7,6 +7,7 @@
 
 import time
 import datetime
+import pytz
 import logging
 import tornado.log
 import tornado.ioloop
@@ -130,6 +131,7 @@ class MainWorker(object):
         user = self.db.user.get(task['userid'], fields=('id', 'email', 'email_verified', 'nickname'))
         tpl = self.db.tpl.get(task['tplid'], fields=('id', 'userid', 'sitename', 'siteurl', 'tpl',
             'interval', 'last_success'))
+        ontime = self.db.task.get(task['id'], fields=('ontime', 'ontimeflg'))
 
         if task['disabled']:
             self.db.tasklog.add(task['id'], False, msg='task disabled.')
@@ -166,9 +168,31 @@ class MainWorker(object):
                     new_env['session'].to_json() if hasattr(new_env['session'], 'to_json') else new_env['session'])
 
             # todo next not mid night
-            next = time.time() + max((tpl['interval'] if tpl['interval'] else 24 * 60 * 60), 1*60)
-            if tpl['interval'] is None:
-                next = self.fix_next_time(next)
+            if (ontime['ontimeflg'] == 1):
+                temp = ontime['ontime']
+                now = datetime.datetime.now()
+                ehour = int(temp[0:2])
+                emin = int(temp[-2:])
+
+                if(ehour >= now.hour):
+                    if (emin > now.minute):
+                        eday = now.day
+                    else:
+                        eday = now.day+1
+                else :
+                    eday = now.day+1
+                tz = pytz.timezone('Asia/Shanghai')
+                pre = datetime.datetime(year=now.year, 
+                                        month=now.month, 
+                                        day=eday, 
+                                        hour=ehour, 
+                                        minute=emin, 
+                                        tzinfo=tz)
+                next = int(time.mktime(pre.timetuple()) + pre.microsecond/1e6)
+            else:
+                next = time.time() + max((tpl['interval'] if tpl['interval'] else 24 * 60 * 60), 1*60)
+                if tpl['interval'] is None:
+                    next = self.fix_next_time(next)
 
             # success feedback
             self.db.tasklog.add(task['id'], success=True, msg=new_env['variables'].get('__log__'))
@@ -213,8 +237,8 @@ class MainWorker(object):
                     next=next)
             self.db.tpl.incr_failed(tpl['id'])
 
-            if task['success_count'] and task['last_failed_count'] and user['email_verified'] and user['email']\
-                    and self.is_tommorrow(next):
+            if task['success_count'] and task['last_failed_count'] and user['email_verified'] and user['email']:
+                    #and self.is_tommorrow(next):
                 try:
                     _ = yield utils.send_mail(to=user['email'], subject=u"%s - 签到失败%s" % (
                         tpl['sitename'], u' 已停止' if disabled else u""),

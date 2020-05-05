@@ -8,6 +8,8 @@
 import json
 import time
 from tornado import gen
+import datetime 
+import pytz
 
 from base import *
 
@@ -144,10 +146,78 @@ class TaskDelHandler(BaseHandler):
         self.db.task.delete(task['id'])
         referer = self.request.headers.get('referer', '/my/')
         self.redirect(referer)
+        
+class TaskSetTimeHandler(TaskNewHandler):
+    @tornado.web.authenticated
+    def get(self, taskid):
+        user = self.current_user
+        task = self.check_permission(self.db.task.get(taskid, fields=('id', 'userid',
+            'tplid', 'disabled', 'note')), 'w')
 
+        tpl = self.check_permission(self.db.tpl.get(task['tplid'], fields=('id', 'userid', 'note',
+            'sitename', 'siteurl', 'variables')))
+
+        variables = json.loads(tpl['variables'])
+        self.render('task_setTime.html', tpls=[tpl, ], tplid=tpl['id'], tpl=tpl, variables=variables, task=task)
+    
+    @tornado.web.authenticated
+    def post(self, taskid):
+        self.evil(+2)
+        
+        task = self.check_permission(self.db.task.get(taskid, fields=('id', 'tplid', 'userid', 'init_env',
+            'env', 'session', 'last_success', 'last_failed', 'success_count',
+            'failed_count', 'last_failed_count', 'next', 'disabled')), 'w')
+
+        tpl = self.check_permission(self.db.tpl.get(task['tplid'], fields=('id', 'userid', 'sitename',
+            'siteurl', 'tpl', 'interval', 'last_success')))
+
+        ontime = self.request.body_arguments['timevalue'][0]
+        
+        if  ('flg' in self.request.body_arguments):
+            OntimeFlg = 1
+            tz = pytz.timezone('Asia/Shanghai')
+            now = datetime.datetime.now()
+            now = datetime.datetime(year=now.year, 
+                                    month=now.month, 
+                                    day=now.day, 
+                                    hour=now.hour, 
+                                    minute=now.minute, 
+                                    tzinfo=tz) 
+            ehour = int(ontime[0:2])
+            emin = int(ontime[-2:])
+            if(ehour >= now.hour):
+                if (emin > now.minute):
+                   eday = now.day
+                else:
+                    eday = now.day+1
+            else :
+                eday = now.day+1
+            tz = pytz.timezone('Asia/Shanghai')
+            pre = datetime.datetime(year=now.year, 
+                                    month=now.month, 
+                                    day=eday, 
+                                    hour=ehour, 
+                                    minute=emin, 
+                                    tzinfo=tz)
+            next = int(time.mktime(pre.timetuple()) + pre.microsecond/1e6)
+            
+        else :
+            OntimeFlg = 0
+            next = time.time() + (tpl['interval'] if tpl['interval'] else 24 * 60 * 60)
+        
+        self.db.task.mod(task['id'],
+                disabled = False,
+                ontime = ontime,
+                ontimeflg = OntimeFlg,
+                next = next)
+                
+        self.redirect('/my/')
+        
+        
 handlers = [
         ('/task/new', TaskNewHandler),
         ('/task/(\d+)/edit', TaskEditHandler),
+        ('/task/(\d+)/settime', TaskSetTimeHandler),
         ('/task/(\d+)/del', TaskDelHandler),
         ('/task/(\d+)/log', TaskLogHandler),
         ('/task/(\d+)/run', TaskRunHandler),

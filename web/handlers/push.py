@@ -125,7 +125,7 @@ class PushActionHandler(BaseHandler):
                     har = har,
                     tpl = tpl,
                     variables = tplobj['variables'],
-                    interval = tplobj['interval'],
+                    interval = tplobj['interval']
                     )
             self.db.tpl.mod(tplid,
                     sitename = tplobj['sitename'],

@@ -42,6 +42,8 @@ class TaskDB(BaseDB):
                 next = None,
                 ctime = now,
                 mtime = now,
+                ontime='00:10',
+                ontimeflg=0,
                 )
         return self._insert(**insert)
 
