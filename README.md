@@ -1,5 +1,7 @@
-qiandao
-基于quchaonet的蓝调主题签到增加了 源镜像：https://hub.docker.com/r/quchaonet/qiandao
+qiandao 
+维护：[AragonSnow][https://github.com/AragonSnow/qiandao]
+
+基于quchaonet的蓝调主题签到增加了
 
 1、设置任务最低间隔时间及任务request最高100限制 (by 戏如人生)
 
@@ -11,9 +13,9 @@ https://hexo.aragon.wang/2020/04/11/%E7%AD%BE%E5%88%B0%E5%A4%B1%E8%B4%A5%E6%8E%A
 
 需要推送的： 挂载时候添加一个参数 -v 实际目录:/usr/src/app/config,再添加一个config.json文件再实际目录下面，示例：
 
-docker 启动命令：
-docker run -d --name qiandao -p 12345:80 -v /root/config:/usr/src/app/config -v /etc/localtime:/etc/localtime q123458384/qiandao
+
 再在 /root/config 目录下新建一个 config.json文件，内容如下：
+```
 {
 	"bark链接" : "bark的链接，不用就留空",
 	"s酱key" : "s酱的skey，不用就留空",
@@ -24,6 +26,18 @@ docker run -d --name qiandao -p 12345:80 -v /root/config:/usr/src/app/config -v 
 		"填空ID":"腾讯问卷的填空ID，不用就留空"
 	}
 }
+```
+3、增加了定时功能：https://github.com/AragonSnow/qiandao
+
+
+
+
+docker 启动命令：
+```
+docker run -d --name qiandao -p 12345:80 -v /root/config:/usr/src/app/config -v /etc/localtime:/etc/localtime q123458384/qiandao
+```
+
+
 ========= 以下为原镜像说明：
 
 签到 —— 一个自动签到框架 base on an HAR editor
@@ -63,7 +77,7 @@ mailgun_key = ""
 鸣谢
 +[Mark][https://www.quchao.net/]
 
-+[戏如人生][https://www.quchao.net/]
++[戏如人生][https://49594425.xyz/]
 
 +[AragonSnow][https://hexo.aragon.wang/]
 
