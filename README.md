@@ -16,10 +16,10 @@ https://hexo.aragon.wang/2020/04/11/%E7%AD%BE%E5%88%B0%E5%A4%B1%E8%B4%A5%E6%8E%A
 
 docker 启动命令：
 ```
-docker run -d --name qiandao -p 12345:80 -v /app/toolapi:/usr/src/app/config -v /etc/localtime:/etc/localtime q123458384/qiandao
+docker run -d --name qiandao -p 12345:80 -v /app/qiandao:/usr/src/app/config -v /etc/localtime:/etc/localtime q123458384/qiandao
 ```
 
-再在 /app/toolapi 目录下新建一个 config.json文件，内容如下：
+再在 /app/qiandao 目录下新建一个 config.json文件，内容如下：
 ```
 {
 	"bark链接" : "bark的链接，不用就留空",
