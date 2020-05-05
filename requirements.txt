@@ -6,3 +6,4 @@ requests
 pbkdf2
 pycryptodome
 mysql.connector
+pytz

@@ -2,4 +2,6 @@
 *.pyc
 database.db
 venv/
+env27/
 .python-version
+.vscode
