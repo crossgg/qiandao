@@ -86,3 +86,9 @@ class send2phone:
                 print('Reason:', e) 
 
         return
+    
+if __name__ == "__main__":
+    pushno = send2phone()
+    pushno.send2bark("签到任务 {0} 失败".format('test'), "任务已禁用")
+    pushno.send2s("签到任务 {0} 失败".format('test'), "任务已禁用")
+    pushno.send2BarkAndWJ(u"签到任务 {0} 失败".format('test'), u"任务已禁用")

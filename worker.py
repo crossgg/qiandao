@@ -193,22 +193,23 @@ class MainWorker(object):
         except Exception as e:
             # failed feedback
             next_time_delta = self.failed_count_to_time(task['last_failed_count'], tpl['interval'])
-
+            pushno = send2phone.send2phone()
+            t = datetime.datetime.now().strftime('%m-%d %H:%M:%S')
+            title = "{0}签到任务 {1} 失败".format(t, tpl['sitename'])
             if next_time_delta:
                 # 每次都推送通知
-                pushno = send2phone.send2phone()
-                pushno.send2bark("签到任务 {0} 失败".format(tpl['sitename']), "请检查状态")
-                pushno.send2s("签到任务 {0} 失败".format(tpl['sitename']), "请检查状态")
-                pushno.send2BarkAndWJ("签到任务 {0} 失败".format(tpl['sitename']), "请检查状态")
+                pushno.send2bark(title, "请检查状态")
+                pushno.send2s(title, "请检查状态")
+                pushno.send2BarkAndWJ(title, "请检查状态")
                 disabled = False
                 next = time.time() + next_time_delta
             else:
                 disabled = True
                 next = None
                 # 任务禁用时发送通知
-                pushno.send2bark("签到任务 {0} 失败".format(tpl['sitename']), "任务已禁用")
-                pushno.send2s("签到任务 {0} 失败".format(tpl['sitename']), "任务已禁用")
-                pushno.send2BarkAndWJ(u"签到任务 {0} 失败".format(tpl['sitename']), u"任务已禁用")
+                pushno.send2bark(title, "任务已禁用")
+                pushno.send2s(title, "任务已禁用")
+                pushno.send2BarkAndWJ(title, "任务已禁用")
 
             self.db.tasklog.add(task['id'], success=False, msg=unicode(e))
             self.db.task.mod(task['id'],
