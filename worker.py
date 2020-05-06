@@ -18,6 +18,8 @@ import config
 from libs import utils
 from libs.fetcher import Fetcher
 
+from web.handlers.task import calNextTimestamp
+
 logger = logging.getLogger('qiandao.worker')
 class MainWorker(object):
     def __init__(self):
@@ -169,26 +171,7 @@ class MainWorker(object):
 
             # todo next not mid night
             if (ontime['ontimeflg'] == 1):
-                temp = ontime['ontime']
-                now = datetime.datetime.now()
-                ehour = int(temp[0:2])
-                emin = int(temp[-2:])
-
-                if(ehour >= now.hour):
-                    if (emin > now.minute):
-                        eday = now.day
-                    else:
-                        eday = now.day+1
-                else :
-                    eday = now.day+1
-                tz = pytz.timezone('Asia/Shanghai')
-                pre = datetime.datetime(year=now.year, 
-                                        month=now.month, 
-                                        day=eday, 
-                                        hour=ehour, 
-                                        minute=emin, 
-                                        tzinfo=tz)
-                next = int(time.mktime(pre.timetuple()) + pre.microsecond/1e6)
+                next = calNextTimestamp(ontime['ontime'])
             else:
                 next = time.time() + max((tpl['interval'] if tpl['interval'] else 24 * 60 * 60), 1*60)
                 if tpl['interval'] is None:
@@ -210,22 +193,23 @@ class MainWorker(object):
         except Exception as e:
             # failed feedback
             next_time_delta = self.failed_count_to_time(task['last_failed_count'], tpl['interval'])
-
+            pushno = send2phone.send2phone()
+            t = datetime.datetime.now().strftime('%m-%d %H:%M:%S')
+            title = "{0}签到任务 {1} 失败".format(t, tpl['sitename'])
             if next_time_delta:
                 # 每次都推送通知
-                pushno = send2phone.send2phone()
-                pushno.send2bark("签到任务 {0} 失败".format(tpl['sitename']), "请检查状态")
-                pushno.send2s("签到任务 {0} 失败".format(tpl['sitename']), "请检查状态")
-                pushno.send2BarkAndWJ("签到任务 {0} 失败".format(tpl['sitename']), "请检查状态")
+                pushno.send2bark(title, "请检查状态")
+                pushno.send2s(title, "请检查状态")
+                pushno.send2BarkAndWJ(title, "请检查状态")
                 disabled = False
                 next = time.time() + next_time_delta
             else:
                 disabled = True
                 next = None
                 # 任务禁用时发送通知
-                pushno.send2bark("签到任务 {0} 失败".format(tpl['sitename']), "任务已禁用")
-                pushno.send2s("签到任务 {0} 失败".format(tpl['sitename']), "任务已禁用")
-                pushno.send2BarkAndWJ(u"签到任务 {0} 失败".format(tpl['sitename']), u"任务已禁用")
+                pushno.send2bark(title, "任务已禁用")
+                pushno.send2s(title, "任务已禁用")
+                pushno.send2BarkAndWJ(title, "任务已禁用")
 
             self.db.tasklog.add(task['id'], success=False, msg=unicode(e))
             self.db.task.mod(task['id'],
