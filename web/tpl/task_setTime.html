@@ -37,6 +37,11 @@
       <input type="checkbox" id="flg" name="flg" checked="checked"> 强制每天定时
     </label>
   </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" id="todayflg" name="todayflg" checked="checked"> 今天是否运行
+    </label>
+  </div>
 
   <div class="text-right">
     {% if current_user %}
@@ -50,6 +55,7 @@
         var tplid = $('select[name=_binux_tplid]').val();
         var oTimer = document.getElementById("tiemvalue");
         var everydaytflg = document.getElementById("flg");
+        var everydaytflg = document.getElementById("todayflg");
         var env = {};
         for (var _env=$('form').serializeArray(), i=_env.length-1; i>=0; i--) {
           env[_env[i].name] = _env[i].value;
