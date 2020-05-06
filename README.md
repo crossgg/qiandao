@@ -3,11 +3,11 @@ qiandao
 基于quchaonet的蓝调主题签到增加了
 源镜像：https://hub.docker.com/r/quchaonet/qiandao
 
-1、设置任务最低间隔时间及任务request最高100限制 (by 戏如人生)
+1. 设置任务最低间隔时间及任务request最高100限制 (by 戏如人生)
 
 http://cordimax.f3322.net:5558/381.html
 
-2、增加了server酱、bark推送（by AragonSnow）
+2. 增加了server酱、bark推送（by AragonSnow）
 
 https://hexo.aragon.wang/2020/04/11/%E7%AD%BE%E5%88%B0%E5%A4%B1%E8%B4%A5%E6%8E%A8%E9%80%81%E5%88%B0%E6%89%8B%E6%9C%BA/
 
@@ -28,6 +28,8 @@ docker run -d --name qiandao -p 12345:80 -v /root/config:/usr/src/app/config -v 
 	}
 }
 ```
+3. 增加定时功能，在新建任务以后会出现定时按钮，设置每天的定时时间。<br>
+<font size=5 color='red'>不兼容旧版的数据库， 旧版的数据库需要运行 python sqlite3_db_task_converter.py转换数据库, 新建无影响</font><br>
 
 =========
 以下为原镜像说明：
@@ -95,11 +97,11 @@ mailgun_key = ""
 鸣谢
 ====
 
-+[Mark][https://www.quchao.net/] 
+[Mark  https://www.quchao.net/][https://www.quchao.net/] 
 
-+[戏如人生][https://www.quchao.net/]
+[戏如人生 https://49594425.xyz/][https://49594425.xyz/]
 
-+[AragonSnow][https://hexo.aragon.wang/]
+[AragonSnow https://hexo.aragon.wang/][https://hexo.aragon.wang/]
 
 许可
 ====
