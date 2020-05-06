@@ -195,12 +195,12 @@ class MainWorker(object):
             next_time_delta = self.failed_count_to_time(task['last_failed_count'], tpl['interval'])
             pushno = send2phone.send2phone()
             t = datetime.datetime.now().strftime('%m-%d %H:%M:%S')
-            title = "{0}签到任务 {1} 失败".format(t, tpl['sitename'])
+            title = u"签到任务 {0} 失败".format(tpl['sitename'])
             if next_time_delta:
                 # 每次都推送通知
-                pushno.send2bark(title, "请检查状态")
-                pushno.send2s(title, "请检查状态")
-                pushno.send2BarkAndWJ(title, "请检查状态")
+                pushno.send2bark(title, u"{0} 请检查状态".format(t))
+                pushno.send2s(title, u"{0} 请检查状态".format(t))
+                pushno.send2BarkAndWJ(title, u"{0} 请检查状态".format(t))
                 disabled = False
                 next = time.time() + next_time_delta
             else:

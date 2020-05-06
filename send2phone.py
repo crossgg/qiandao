@@ -44,7 +44,7 @@ class send2phone:
     def send2bark(self, title, content):
         if (self.barklink) and (self.wj[u"链接"] == ""):
             try:
-                msg = "{0}/推送标题/{1}/{2}".format(self.barklink, title, content)
+                msg = u"{0}/推送标题/{1}/{2}".format(self.barklink, title, content)
                 res = requests.get(msg,verify=False)
             except Exception as e:
                 print('Reason:', e)
@@ -64,8 +64,8 @@ class send2phone:
     def send2BarkAndWJ(self, title, content):
         if (self.barklink) and (self.wj[u"链接"]):
             try:
-                msg = "{0}/推送标题/{1}/{2}?url=https://wj.qq.com".format(self.barklink, title, content)
-                requests.get(msg,verify=False)
+                msg = u"{0}/推送标题/{1}/{2}?url=https://wj.qq.com".format(self.barklink, title, content)
+                res = requests.get(msg,verify=False)
                 s = "{\"id\":\"123456\",\"survey_type\":0,\"jsonLoadTime\":3,\"time\":1587372438,\"ua\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36\",\"referrer\":\"https://wj.qq.com/mine.html\",\"openid\":\"\",\"pages\":[{\"id\":\"1\",\"questions\":[{\"id\":\"qID\",\"type\":\"text_multiple\",\"blanks\":[{\"id\":\"fID\",\"value\":\"dasdas\"}]}]}],\"latitude\":\"\",\"longitude\":\"\",\"is_update\":false}"
                 s = s.replace("123456", self.wj["ID"])
                 s = s.replace("qID", self.wj[u"问题ID"])
@@ -78,7 +78,7 @@ class send2phone:
                     "answer_survey":s
                 }
                 
-                requests.post("https://wj.qq.com/sur/collect_answer", 
+                res = requests.post("https://wj.qq.com/sur/collect_answer", 
                               headers=self.base_headers, 
                               json=rjson, 
                               verify=False)

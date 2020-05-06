@@ -28,8 +28,9 @@ class TaskDB(_TaskDB, BaseDB):
           `next` INT UNSIGNED NULL DEFAULT NULL,
           `note` VARCHAR(256) NULL,
           `ctime` INT UNSIGNED NOT NULL,
-          `mtime` INT UNSIGNED NOT NULL
-
+          `mtime` INT UNSIGNED NOT NULL,
+          `ontimeflg` INT UNSIGNED NOT NULL DEFAULT 0,
+          `ontime` VARCHAR(256) NOT NULL DEFAULT '00:10:00'
         )''' % self.__tablename__)
 
         for each in ('userid', 'tplid'):
