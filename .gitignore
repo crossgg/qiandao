@@ -1,6 +1,7 @@
 *.idea
 *.pyc
 database.db
+config.json
 venv/
 env27/
 .python-version

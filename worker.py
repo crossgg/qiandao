@@ -18,6 +18,8 @@ import config
 from libs import utils
 from libs.fetcher import Fetcher
 
+from web.handlers.task import calNextTimestamp
+
 logger = logging.getLogger('qiandao.worker')
 class MainWorker(object):
     def __init__(self):
@@ -169,26 +171,7 @@ class MainWorker(object):
 
             # todo next not mid night
             if (ontime['ontimeflg'] == 1):
-                temp = ontime['ontime']
-                now = datetime.datetime.now()
-                ehour = int(temp[0:2])
-                emin = int(temp[-2:])
-
-                if(ehour >= now.hour):
-                    if (emin > now.minute):
-                        eday = now.day
-                    else:
-                        eday = now.day+1
-                else :
-                    eday = now.day+1
-                tz = pytz.timezone('Asia/Shanghai')
-                pre = datetime.datetime(year=now.year, 
-                                        month=now.month, 
-                                        day=eday, 
-                                        hour=ehour, 
-                                        minute=emin, 
-                                        tzinfo=tz)
-                next = int(time.mktime(pre.timetuple()) + pre.microsecond/1e6)
+                next = calNextTimestamp(ontime['ontime'])
             else:
                 next = time.time() + max((tpl['interval'] if tpl['interval'] else 24 * 60 * 60), 1*60)
                 if tpl['interval'] is None:

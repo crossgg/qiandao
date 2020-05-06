@@ -7,41 +7,29 @@
 import config
 from db.task import TaskDB as _TaskDB
 from sqlite3_db.basedb import BaseDB
-import db.task 
+import db.task as task 
+import os
 
-class TaskDB(_TaskDB, BaseDB):
+class DBconverter(_TaskDB, BaseDB):
     def __init__(self, path=config.sqlite3.path):
         self.path = path
-        self._execute('''CREATE TABLE IF NOT EXISTS `%s` (
-          `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-          `tplid` INT UNSIGNED NOT NULL,
-          `userid` INT UNSIGNED NOT NULL,
-          `disabled` TINYINT(1) NOT NULL DEFAULT 0,
-          `init_env` BLOB NULL,
-          `env` BLOB NULL,
-          `session` BLOB NULL,
-          `last_success` INT UNSIGNED NULL,
-          `last_failed` INT UNSIGNED NULL,
-          `success_count` INT UNSIGNED NOT NULL DEFAULT 0,
-          `failed_count` INT UNSIGNED NOT NULL DEFAULT 0,
-          `last_failed_count` INT UNSIGNED NOT NULL DEFAULT 0,
-          `next` INT UNSIGNED NULL DEFAULT NULL,
-          `note` VARCHAR(256) NULL,
-          `ctime` INT UNSIGNED NOT NULL,
-          `mtime` INT UNSIGNED NOT NULL
-        )''' % self.__tablename__)
-
-        for each in ('userid', 'tplid'):
-            t = '''CREATE INDEX IF NOT EXISTS `ix_%s_%s` ON %s (%s)''' % (
-                self.__tablename__, each, self.__tablename__, each)
-            self._execute(t)
             
     def ConvertNewType(self, path=config.sqlite3.path):
         self.path = path
-        self._execute("ALTER TABLE `task` ADD `ontimeflg` INT NOT NULL DEFAULT 0")
-        self._execute("ALTER TABLE `task` ADD `ontime` VARCHAR(256) NOT NULL DEFAULT '00:10'")            
+        if (os.path.isfile(path)):
+            if config.db_type == 'sqlite3':
+                import sqlite3_db as db
+            else:
+                import db
+            class DB(object):
+                user = db.UserDB()
+                tpl = db.TPLDB()
+                task = db.TaskDB()
+                tasklog = db.TaskLogDB()
+            self.db = DB
+            try:
+                self.db.task.get("1", fields=('ontime', 'ontimeflg'))
+            except:                
+                self._execute("ALTER TABLE `task` ADD `ontimeflg` INT UNSIGNED NOT NULL DEFAULT 0 ")
+                self._execute("ALTER TABLE `task` ADD `ontime` VARCHAR(256) NOT NULL DEFAULT '00:10:00' " )            
         return 
-        
-if __name__ == '__main__':
-    d = TaskDB()
-    d.ConvertNewType(path=config.sqlite3.path)
