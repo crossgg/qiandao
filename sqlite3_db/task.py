@@ -29,11 +29,12 @@ class TaskDB(_TaskDB, BaseDB):
           `note` VARCHAR(256) NULL,
           `ctime` INT UNSIGNED NOT NULL,
           `mtime` INT UNSIGNED NOT NULL,
-          `ontime` VARCHAR(256) NULL,
-          `ontimeflg` INT UNSIGNED NOT NULL
+          `ontimeflg` INT UNSIGNED NOT NULL DEFAULT 0,
+          `ontime` VARCHAR(256) NOT NULL DEFAULT '00:10:00'
         )''' % self.__tablename__)
 
         for each in ('userid', 'tplid'):
-            self._execute('''CREATE INDEX IF NOT EXISTS `ix_%s_%s` ON %s (%s)''' % (
-                self.__tablename__, each, self.__tablename__, each))
+            t = '''CREATE INDEX IF NOT EXISTS `ix_%s_%s` ON %s (%s)''' % (
+                self.__tablename__, each, self.__tablename__, each)
+            self._execute(t)
 

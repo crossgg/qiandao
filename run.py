@@ -14,6 +14,8 @@ import config
 from web.app import Application
 from worker import MainWorker
 
+import sqlite3_db_task_converter
+
 if __name__ == "__main__":
     # init logging
     logger = logging.getLogger()
@@ -37,6 +39,9 @@ if __name__ == "__main__":
     http_server.bind(port, config.bind)
     http_server.start()
 
+    converter = sqlite3_db_task_converter.DBconverter()
+    converter.ConvertNewType() 
+    
     worker = MainWorker()
     PeriodicCallback(worker, config.check_task_loop).start()
     worker()

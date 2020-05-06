@@ -13,7 +13,34 @@ import pytz
 
 from base import *
 
-class TaskNewHandler(BaseHandler):
+def calNextTimestamp(etime):
+    tz = pytz.timezone('Asia/Shanghai')
+    now = datetime.datetime.now()
+    now = datetime.datetime(year=now.year, 
+                            month=now.month, 
+                            day=now.day, 
+                            hour=now.hour, 
+                            minute=now.minute, 
+                            tzinfo=tz)
+    temp = etime.split(":")
+    ehour = int(temp[0])
+    emin = int(temp[1])
+    esecond = int(temp[2])
+    if(ehour >= now.hour):
+        eday = now.day
+    else :
+        eday = now.day+1
+    pre = datetime.datetime(year=now.year, 
+                            month=now.month, 
+                            day=eday, 
+                            hour=ehour, 
+                            minute=emin,
+                            second=esecond,
+                            tzinfo=tz)
+    next = int(time.mktime(pre.timetuple()) + pre.microsecond/1e6)
+    return next
+
+class TaskNewHandler(BaseHandler):    
     def get(self):
         user = self.current_user
         tplid = self.get_argument('tplid', None)
@@ -96,7 +123,7 @@ class TaskRunHandler(BaseHandler):
         user = self.current_user
         task = self.check_permission(self.db.task.get(taskid, fields=('id', 'tplid', 'userid', 'init_env',
             'env', 'session', 'last_success', 'last_failed', 'success_count',
-            'failed_count', 'last_failed_count', 'next', 'disabled')), 'w')
+            'failed_count', 'last_failed_count', 'next', 'disabled', 'ontime', 'ontimeflg')), 'w')
 
         tpl = self.check_permission(self.db.tpl.get(task['tplid'], fields=('id', 'userid', 'sitename',
             'siteurl', 'tpl', 'interval', 'last_success')))
@@ -116,13 +143,18 @@ class TaskRunHandler(BaseHandler):
             return
 
         self.db.tasklog.add(task['id'], success=True, msg=new_env['variables'].get('__log__'))
+        if (task["ontimeflg"] == 1):
+            nextTime = calNextTimestamp(task["ontime"])
+        else:
+            nextTime = time.time() + (tpl['interval'] if tpl['interval'] else 24 * 60 * 60)
+        
         self.db.task.mod(task['id'],
                 disabled = False,
                 last_success = time.time(),
                 last_failed_count = 0,
                 success_count = task['success_count'] + 1,
                 mtime = time.time(),
-                next = time.time() + (tpl['interval'] if tpl['interval'] else 24 * 60 * 60))
+                next = nextTime)
         self.db.tpl.incr_success(tpl['id'])
         self.finish('<h1 class="alert alert-success text-center">签到成功</h1>')
         return
@@ -158,7 +190,7 @@ class TaskSetTimeHandler(TaskNewHandler):
             'sitename', 'siteurl', 'variables')))
 
         variables = json.loads(tpl['variables'])
-        self.render('task_setTime.html', tpls=[tpl, ], tplid=tpl['id'], tpl=tpl, variables=variables, task=task)
+        self.render('task_setTime.html', tpls=[tpl, ], tplid=tpl['id'], tpl=tpl, task=task)
     
     @tornado.web.authenticated
     def post(self, taskid):
@@ -172,35 +204,13 @@ class TaskSetTimeHandler(TaskNewHandler):
             'siteurl', 'tpl', 'interval', 'last_success')))
 
         ontime = self.request.body_arguments['timevalue'][0]
+        temp = ontime.split(":")
+        if (len(temp) < 3):
+            ontime = ontime + ":00"     # 没有秒自动补零
         
         if  ('flg' in self.request.body_arguments):
             OntimeFlg = 1
-            tz = pytz.timezone('Asia/Shanghai')
-            now = datetime.datetime.now()
-            now = datetime.datetime(year=now.year, 
-                                    month=now.month, 
-                                    day=now.day, 
-                                    hour=now.hour, 
-                                    minute=now.minute, 
-                                    tzinfo=tz) 
-            ehour = int(ontime[0:2])
-            emin = int(ontime[-2:])
-            if(ehour >= now.hour):
-                if (emin > now.minute):
-                   eday = now.day
-                else:
-                    eday = now.day+1
-            else :
-                eday = now.day+1
-            tz = pytz.timezone('Asia/Shanghai')
-            pre = datetime.datetime(year=now.year, 
-                                    month=now.month, 
-                                    day=eday, 
-                                    hour=ehour, 
-                                    minute=emin, 
-                                    tzinfo=tz)
-            next = int(time.mktime(pre.timetuple()) + pre.microsecond/1e6)
-            
+            next = calNextTimestamp(ontime)
         else :
             OntimeFlg = 0
             next = time.time() + (tpl['interval'] if tpl['interval'] else 24 * 60 * 60)

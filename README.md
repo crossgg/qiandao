@@ -29,7 +29,7 @@ docker run -d --name qiandao -p 12345:80 -v /root/config:/usr/src/app/config -v 
 }
 ```
 3. 增加定时功能，在新建任务以后会出现定时按钮，设置每天的定时时间。<br>
-<font size=5 color='red'>不兼容旧版的数据库， 旧版的数据库需要运行 python sqlite3_db_task_converter.py转换数据库, 新建无影响</font><br>
+<font size=5 color='red'>不兼容旧版的数据库， 旧版数据库导入会自动转换，旧版将无法使用</font><br>
 
 =========
 以下为原镜像说明：
@@ -97,11 +97,11 @@ mailgun_key = ""
 鸣谢
 ====
 
-[Mark  https://www.quchao.net/][https://www.quchao.net/] 
+[Mark  https://www.quchao.net/](https://www.quchao.net/) 
 
-[戏如人生 https://49594425.xyz/][https://49594425.xyz/]
+[戏如人生 https://49594425.xyz/](https://49594425.xyz/)
 
-[AragonSnow https://hexo.aragon.wang/][https://hexo.aragon.wang/]
+[AragonSnow https://hexo.aragon.wang/](https://hexo.aragon.wang/)
 
 许可
 ====
