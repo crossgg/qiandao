@@ -2,13 +2,13 @@
 FROM python:2.7-alpine
 
 # 维护者信息
-LABEL maintainer "Mark <www.quchao.net>"
+LABEL maintainer "AragonSnow <https://github.com/AragonSnow/qiandao>"
 
-# 签到版本 20190220
+# 签到版本 20190118
 # 集成皮蛋0.1.1  https://github.com/cdpidan/qiandaor
 # 加入蓝调主题 20190118 https://www.quchao.net/QianDao-Theme.html
 # --------------
-# 基于以上镜像修改了：1、时区设置为上海 2、修改了链接限制 3、加入了send2推送
+# 基于以上镜像修改了：1、时区设置为CST-8 2、修改了链接限制 3、加入了send2推送
 
 ADD . /usr/src/app
 WORKDIR /usr/src/app
@@ -22,9 +22,7 @@ ENV PORT 80
 EXPOSE $PORT/tcp
 
 # timezone
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-RUN echo 'Asia/Shanghai' >/etc/timezone
-ENV TZ=Asia/Shanghai
+ENV TZ=CST-8
 
 # 添加挂载点
 VOLUME ["/usr/src/app/"]
