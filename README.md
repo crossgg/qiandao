@@ -29,9 +29,9 @@ docker run -d --name qiandao -p 12345:80 -v /root/config:/usr/src/app/config -v 
 }
 ```
 3. 增加定时功能，在新建任务以后会出现定时按钮，设置每天的定时时间。<br>
-__不兼容旧版的数据库， 旧版数据库导入会自动转换，旧版将无法使用__
-__使用SQLite3的，默认路径改为config文件夹里面，方便挂载后备份__
-__使用Mysq的,请使用一下命令更新数据库：__
+__不兼容旧版的数据库， 旧版数据库导入会自动转换，旧版将无法使用__<br>
+__使用SQLite3的，默认路径改为config文件夹里面，方便挂载后备份__<br>
+__使用Mysq的,请使用一下命令更新数据库：__<br>
 ```
 ALTER TABLE `task` ADD `ontimeflg` INT UNSIGNED NOT NULL DEFAULT 0
 ALTER TABLE `task` ADD `ontime` VARCHAR(256) NOT NULL DEFAULT '00:10:00'

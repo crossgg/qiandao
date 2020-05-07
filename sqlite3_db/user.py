@@ -25,7 +25,10 @@ class UserDB(_UserDB, BaseDB):
           `atime` INT UNSIGNED NOT NULL,
           `cip` INT UNSIGNED NOT NULL,
           `mip` INT UNSIGNED NOT NULL,
-          `aip` INT UNSIGNED NOT NULL
+          `aip` INT UNSIGNED NOT NULL,
+          `skey` VARBINARY(128) NOT NULL DEFAULT '',
+          `barkurl` VARBINARY(128) NOT NULL DEFAULT '',
+          `noticeflg` INT UNSIGNED NOT NULL DEFAULT 1
         )''' % self.__tablename__)
 
         for each in ('email', 'nickname'):
