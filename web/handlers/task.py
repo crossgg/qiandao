@@ -13,7 +13,7 @@ import pytz
 
 from base import *
 
-def calNextTimestamp(etime):
+def calNextTimestamp(etime, todayflg):
     tz = pytz.timezone('Asia/Shanghai')
     now = datetime.datetime.now()
     now = datetime.datetime(year=now.year, 
@@ -23,13 +23,13 @@ def calNextTimestamp(etime):
                             minute=now.minute, 
                             tzinfo=tz)
     temp = etime.split(":")
+    if (todayflg):
+        eday = now.day
+    else:
+        eday = now.day+1
     ehour = int(temp[0])
     emin = int(temp[1])
     esecond = int(temp[2])
-    if(ehour >= now.hour):
-        eday = now.day
-    else :
-        eday = now.day+1
     pre = datetime.datetime(year=now.year, 
                             month=now.month, 
                             day=eday, 
@@ -144,7 +144,7 @@ class TaskRunHandler(BaseHandler):
 
         self.db.tasklog.add(task['id'], success=True, msg=new_env['variables'].get('__log__'))
         if (task["ontimeflg"] == 1):
-            nextTime = calNextTimestamp(task["ontime"])
+            nextTime = calNextTimestamp(task["ontime"], todayflg=False)
         else:
             nextTime = time.time() + (tpl['interval'] if tpl['interval'] else 24 * 60 * 60)
         
@@ -210,7 +210,10 @@ class TaskSetTimeHandler(TaskNewHandler):
         
         if  ('flg' in self.request.body_arguments):
             OntimeFlg = 1
-            next = calNextTimestamp(ontime)
+            if  ('todayflg' in self.request.body_arguments):
+                next = calNextTimestamp(ontime, todayflg=True)
+            else:
+                next = calNextTimestamp(ontime, todayflg=False)
         else :
             OntimeFlg = 0
             next = time.time() + (tpl['interval'] if tpl['interval'] else 24 * 60 * 60)

@@ -171,7 +171,7 @@ class MainWorker(object):
 
             # todo next not mid night
             if (ontime['ontimeflg'] == 1):
-                next = calNextTimestamp(ontime['ontime'])
+                next = calNextTimestamp(ontime['ontime'], todayflg=False)
             else:
                 next = time.time() + max((tpl['interval'] if tpl['interval'] else 24 * 60 * 60), 1*60)
                 if tpl['interval'] is None:
