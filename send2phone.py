@@ -34,6 +34,7 @@ class send2phone:
     def send2s(self, title, content):
         if (self.skey != ""):
             try:
+                self.skey = self.skey.replace(".send", "")
                 link = u"https://sc.ftqq.com/{0}.send".format(self.skey)
                 d = {'text': title, 'desp': content}
                 res = requests.post(link, data=d , verify=False)

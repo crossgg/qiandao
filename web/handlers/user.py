@@ -18,17 +18,10 @@ class UserRegBark(BaseHandler):
     @tornado.web.authenticated
     def get(self, taskid):
         user = self.current_user
-        task = self.check_permission(self.db.task.get(taskid, fields=('id', 'userid',
-            'tplid', 'disabled', 'note')), 'w')
-
-        tpl = self.check_permission(self.db.tpl.get(task['tplid'], fields=('id', 'userid', 'note',
-            'sitename', 'siteurl', 'variables')))
-
-        self.render('user_register_barkurl.html', userid=user['id'] ,tpls=[tpl, ], tplid=tpl['id'], tpl=tpl, task=task)
+        self.render('user_register_barkurl.html', userid=user['id'])
     
     @tornado.web.authenticated
     def post(self, userid):
-        self.evil(+5)
         if  ("testbark" in self.request.body_arguments):
             try:
                 if  (self.request.body_arguments["barkurl"][0] != ""):
@@ -63,17 +56,10 @@ class UserRegschan(BaseHandler):
     @tornado.web.authenticated
     def get(self, taskid):
         user = self.current_user
-        task = self.check_permission(self.db.task.get(taskid, fields=('id', 'userid',
-            'tplid', 'disabled', 'note')), 'w')
-
-        tpl = self.check_permission(self.db.tpl.get(task['tplid'], fields=('id', 'userid', 'note',
-            'sitename', 'siteurl', 'variables')))
-
-        self.render('user_register_schan.html', userid=user['id'] ,tpls=[tpl, ], tplid=tpl['id'], tpl=tpl, task=task)
+        self.render('user_register_schan.html', userid=user['id'])
     
     @tornado.web.authenticated
     def post(self, userid):
-        self.evil(+5)
         if  ("testschan" in self.request.body_arguments):
             try:
                 if  (self.request.body_arguments["skey"][0] != ""):
@@ -106,31 +92,22 @@ class UserRegschan(BaseHandler):
         
 class UserRegPushSw(BaseHandler):
     @tornado.web.authenticated
-    def get(self, taskid):
-        user = self.current_user
-        task = self.check_permission(self.db.task.get(taskid, fields=('id', 'userid',
-            'tplid', 'disabled', 'note')), 'w')
-
-        tpl = self.check_permission(self.db.tpl.get(task['tplid'], fields=('id', 'userid', 'note',
-            'sitename', 'siteurl', 'variables')))
-
-        self.render('user_register_pushsw.html', userid=user['id'] ,tpls=[tpl, ], tplid=tpl['id'], tpl=tpl, task=task)
+    def get(self, userid):
+        temp = self.db.user.get(userid, fields=('noticeflg'))
+        temp = temp['noticeflg']
+        flg = {}
+        flg['handpush_succ'] = False if ((temp & 0x8) == 0) else True 
+        flg['handpush_fail'] = False if ((temp & 0x4) == 0) else True 
+        flg['autopush_succ'] = False if ((temp & 0x2) == 0) else True 
+        flg['autopush_fail'] = False if ((temp & 0x1) == 0) else True 
+        self.render('user_register_pushsw.html', userid=userid, flg=flg)
     
     @tornado.web.authenticated
     def post(self, userid):
-        self.evil(+5)
-        handpush_succ_flg = 0
-        handpush_fail_flg = 0
-        autopush_succ_flg = 0
-        autopush_fail_flg = 0
-        if  ("handpush_succ" in self.request.body_arguments):
-            handpush_succ_flg = 1
-        if  ("handpush_fail" in self.request.body_arguments):
-            handpush_fail_flg = 1
-        if  ("autopush_succ" in self.request.body_arguments):
-            autopush_succ_flg = 1
-        if  ("autopush_fail" in self.request.body_arguments): 
-            autopush_fail_flg = 1
+        handpush_succ_flg = 1 if ("handpush_succ" in self.request.body_arguments) else 0
+        handpush_fail_flg = 1 if ("handpush_fail" in self.request.body_arguments) else 0
+        autopush_succ_flg = 1 if ("autopush_succ" in self.request.body_arguments) else 0
+        autopush_fail_flg = 1 if ("autopush_fail" in self.request.body_arguments) else 0
         flg = (handpush_succ_flg << 3) | (handpush_fail_flg << 2) | (autopush_succ_flg << 1)  | (autopush_fail_flg)
         self.db.user.mod(userid, noticeflg=flg)
         
