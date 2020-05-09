@@ -19,7 +19,7 @@
     </select>
   </div>
 
-  <input type="time" id="timevalue" value="00:00:00" name='timevalue', step="1"/>
+  <input type="time" id="timevalue" value="00:00:00" name='timevalue', step="1" min="{{ mintime }}"/>
 
   {% if current_user %}
   <div class="form-group">
@@ -34,12 +34,12 @@
 
   <div class="checkbox">
     <label>
-      <input type="checkbox" id="flg" name="flg" checked="checked"> 强制每天定时
+      <input type="checkbox" id="flg" name="flg" {% if ontimeflg %}  checked="" {% endif %}> 强制每天定时
     </label>
   </div>
   <div class="checkbox">
     <label>
-      <input type="checkbox" id="todayflg" name="todayflg" checked="checked"> 今天是否运行
+      <input type="checkbox" id="todayflg" name="todayflg" checked="checked" onchange="checkboxOnclick(this)"> 今天是否运行
     </label>
   </div>
 
@@ -48,45 +48,18 @@
     <button id="send" data-method="POST" href="/task/{{ task.id }}/settime" class="btn btn-primary">提交</button>
     {% endif %}
   </div>
-  <script>
-    $(function() {
-      // senddata
-      $('#send').on('click', function() {
-        var tplid = $('select[name=_binux_tplid]').val();
-        var oTimer = document.getElementById("tiemvalue");
-        var everydaytflg = document.getElementById("flg");
-        var everydaytflg = document.getElementById("todayflg");
-        var env = {};
-        for (var _env=$('form').serializeArray(), i=_env.length-1; i>=0; i--) {
-          env[_env[i].name] = _env[i].value;
-        }
-        var data = {
-          env: JSON.stringify(env),
-          _binux_tplid: tpltid,
-          time: oTimer,
-          checkbox: everydaytflg
-        }
+  
 
-        var $this = $(this);
-        $this.button('loading');
-        $.ajax("/task/{{ task.id }}/settime", {
-          type: 'POST',
-          data: data,
-        })
-        .done(function(data) {
-          $('#run-result').html(data).show()
-        })
-        .fail(function(jxhr) {
-          $('#run-result').html('<h1 class="alert alert-danger text-center">设置失败</h1><div class="well"></div>').show().find('div').text(jxhr.responseText);
-        })
-        .always(function() {
-          $this.button('reset');
-        });
-
-        return false;
-      });
-    })
-  </script>
+	<script>
+    function checkboxOnclick(checkbox){
+          if (checkbox.checked == true){
+              document.getElementById("timevalue").min="{{ mintime }}";
+          }else{
+            document.getElementById("timevalue").min="00:00:00";
+          }
+      }
+	</script>
+  
   {{ utils.task_new_scripts() }}
   {{ utils.submit_loading() }}
 </form>

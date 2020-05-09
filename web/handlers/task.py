@@ -204,13 +204,16 @@ class TaskSetTimeHandler(TaskNewHandler):
     def get(self, taskid):
         user = self.current_user
         task = self.check_permission(self.db.task.get(taskid, fields=('id', 'userid',
-            'tplid', 'disabled', 'note')), 'w')
+            'tplid', 'disabled', 'note', 'ontimeflg')), 'w')
 
         tpl = self.check_permission(self.db.tpl.get(task['tplid'], fields=('id', 'userid', 'note',
             'sitename', 'siteurl', 'variables')))
-
+        
         variables = json.loads(tpl['variables'])
-        self.render('task_setTime.html', tpls=[tpl, ], tplid=tpl['id'], tpl=tpl, task=task)
+        todayflg = True if task['ontimeflg'] == 1 else False
+        now = datetime.datetime.now().strftime( '%H:%M:%S')
+        
+        self.render('task_setTime.html', tpls=[tpl, ], tplid=tpl['id'], tpl=tpl, task=task, ontimeflg=todayflg, mintime=now)
     
     @tornado.web.authenticated
     def post(self, taskid):
