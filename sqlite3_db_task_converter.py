@@ -28,8 +28,27 @@ class DBconverter(_TaskDB, BaseDB):
                 tasklog = db.TaskLogDB()
             self.db = DB
             try:
-                self.db.task.get("1", fields=('ontime', 'ontimeflg'))
+                self.db.task.get("1", fields=('ontimeflg'))
             except:                
                 self._execute("ALTER TABLE `task` ADD `ontimeflg` INT UNSIGNED NOT NULL DEFAULT 0 ")
-                self._execute("ALTER TABLE `task` ADD `ontime` VARCHAR(256) NOT NULL DEFAULT '00:10:00' " )            
+                
+            try:
+                self.db.task.get("1", fields=('ontime'))
+            except:                
+                self._execute("ALTER TABLE `task` ADD `ontime` VARCHAR(256) NOT NULL DEFAULT '00:10:00' " )
+                
+            try:
+                self.db.user.get("1", fields=('skey'))
+            except:
+                self._execute("ALTER TABLE `user` ADD `skey` VARBINARY(128) NOT NULL DEFAULT '' ")
+                
+            try:
+                self.db.user.get("1", fields=('barkurl'))
+            except:
+                self._execute("ALTER TABLE `user` ADD `barkurl` VARBINARY(128) NOT NULL DEFAULT '' " )
+                
+            try:
+                self.db.user.get("1", fields=('noticeflg'))
+            except :
+                self._execute("ALTER TABLE `user` ADD `noticeflg` INT UNSIGNED NOT NULL DEFAULT 1 " )             
         return 

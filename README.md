@@ -1,40 +1,30 @@
 qiandao
 =======
-基于quchaonet的蓝调主题签到增加了
-源镜像：https://hub.docker.com/r/quchaonet/qiandao
+__操作前请一定要记得备份数据库__<br>
+__操作前请一定要记得备份数据库__<br>
+__操作前请一定要记得备份数据库__<br>
+
+基于quchaonet的蓝调主题签到增加了:
+
 
 1. 设置任务最低间隔时间及任务request最高100限制 (by 戏如人生)
 
 http://cordimax.f3322.net:5558/381.html
 
-2. 增加了server酱、bark推送（by AragonSnow）
+2. 增加了server酱、bark推送，并可以设置推送开关（by AragonSnow）
+需要推送的：登录账号以后点击注册bark/s酱，测试推送没有问题以后,再点击提交
 
-https://hexo.aragon.wang/2020/04/11/%E7%AD%BE%E5%88%B0%E5%A4%B1%E8%B4%A5%E6%8E%A8%E9%80%81%E5%88%B0%E6%89%8B%E6%9C%BA/
 
-需要推送的：
-挂载时候添加一个参数 -v 实际目录:/usr/src/app/config,再添加一个config.json文件在实际目录下面，示例：
-```
-docker 启动命令：
-docker run -d --name qiandao -p 12345:80 -v /root/config:/usr/src/app/config -v /etc/localtime:/etc/localtime q123458384/qiandao
-再在 /root/config 目录下新建一个 config.json文件，内容如下：
-{
-	"bark链接" : "bark的链接，不用就留空，最后面不要带 / ",
-	"s酱key" : "s酱的skey，不用就留空，不要带.send",
-	"腾讯问卷":{
-		"链接":"腾讯问卷的链接，不用就留空",
-		"ID":"腾讯问卷的ID，不用就留空",
-		"问题ID":"腾讯问卷的问题ID，不用就留空",
-		"填空ID":"腾讯问卷的填空ID，不用就留空"
-	}
-}
-```
 3. 增加定时功能，在新建任务以后会出现定时按钮，设置每天的定时时间。<br>
-__不兼容旧版的数据库， 旧版数据库导入会自动转换，旧版将无法使用__
-__使用SQLite3的，默认路径改为config文件夹里面，方便挂载后备份__
-__使用Mysq的,请使用一下命令更新数据库：__
+__不兼容旧版的数据库， 旧版数据库导入会自动转换，旧版将无法使用__<br>
+__使用SQLite3的，默认路径改为config文件夹里面，方便挂载后备份__<br>
+__使用Mysq的,请使用一下命令更新数据库：__<br>
 ```
 ALTER TABLE `task` ADD `ontimeflg` INT UNSIGNED NOT NULL DEFAULT 0
 ALTER TABLE `task` ADD `ontime` VARCHAR(256) NOT NULL DEFAULT '00:10:00'
+ALTER TABLE `user` ADD `skey` VARBINARY(128) NOT NULL DEFAULT '' 
+ALTER TABLE `user` ADD `barkurl` VARBINARY(128) NOT NULL DEFAULT '' 
+ALTER TABLE `user` ADD `noticeflg` INT UNSIGNED NOT NULL DEFAULT 1
 ```
 
 =========

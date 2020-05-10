@@ -134,6 +134,7 @@ class MainWorker(object):
         tpl = self.db.tpl.get(task['tplid'], fields=('id', 'userid', 'sitename', 'siteurl', 'tpl',
             'interval', 'last_success'))
         ontime = self.db.task.get(task['id'], fields=('ontime', 'ontimeflg'))
+        notice = self.db.user.get(task['userid'], fields=('skey', 'barkurl', 'noticeflg'))
 
         if task['disabled']:
             self.db.tasklog.add(task['id'], False, msg='task disabled.')
@@ -188,28 +189,39 @@ class MainWorker(object):
                     mtime=time.time(),
                     next=next)
             self.db.tpl.incr_success(tpl['id'])
+            if (notice['noticeflg'] & 0x2 != 0):
+                pushno2b = send2phone.send2phone(barkurl=notice['barkurl'])
+                pushno2s = send2phone.send2phone(skey=notice['skey'])
+                t = datetime.datetime.now().strftime('%m-%d %H:%M:%S')
+                title = u"签到任务 {0} 成功".format(tpl['sitename'])
+                pushno2b.send2bark(title, u"{0} 运行成功".format(t))
+                pushno2s.send2s(title, u"{0} 日志：{1}".format(t, new_env['variables'].get('__log__')))
 
             logger.info('taskid:%d tplid:%d successed! %.4fs', task['id'], task['tplid'], time.time()-start)
         except Exception as e:
             # failed feedback
             next_time_delta = self.failed_count_to_time(task['last_failed_count'], tpl['interval'])
-            pushno = send2phone.send2phone()
+            
+            if (notice['noticeflg'] & 1 == 1):
+                pushno2b = send2phone.send2phone(barkurl=notice['barkurl'])
+                pushno2s = send2phone.send2phone(skey=notice['skey'])
+            
             t = datetime.datetime.now().strftime('%m-%d %H:%M:%S')
             title = u"签到任务 {0} 失败".format(tpl['sitename'])
             if next_time_delta:
                 # 每次都推送通知
-                pushno.send2bark(title, u"{0} 请检查状态".format(t))
-                pushno.send2s(title, u"{0} 请检查状态".format(t))
-                pushno.send2BarkAndWJ(title, u"{0} 请检查状态".format(t))
+                if (notice['noticeflg'] & 1 == 1):
+                    pushno2b.send2bark(title, u"{0} 请检查状态".format(t))
+                    pushno2s.send2s(title, u"{0} 请检查状态".format(t))
                 disabled = False
                 next = time.time() + next_time_delta
             else:
                 disabled = True
                 next = None
                 # 任务禁用时发送通知
-                pushno.send2bark(title, "任务已禁用")
-                pushno.send2s(title, "任务已禁用")
-                pushno.send2BarkAndWJ(title, "任务已禁用")
+                if (notice['noticeflg'] & 1 == 1):
+                    pushno2b.send2bark(title, "任务已禁用")
+                    pushno2s.send2s(title, "任务已禁用")
 
             self.db.tasklog.add(task['id'], success=False, msg=unicode(e))
             self.db.task.mod(task['id'],

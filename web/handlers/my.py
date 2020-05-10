@@ -31,7 +31,7 @@ class MyHandler(BaseHandler):
             tpl = self.db.tpl.get(task['tplid'], fields=('id', 'userid', 'sitename', 'siteurl', 'banner', 'note') )
             task['tpl'] = tpl
             tasks.append(task)
-        self.render('my.html', tpls=tpls, tasks=tasks, my_status=my_status)
+        self.render('my.html', tpls=tpls, tasks=tasks, my_status=my_status, userid=user['id'])
 
 handlers = [
         ('/my/?', MyHandler),
